@@ -33,6 +33,7 @@ module.exports = function(cookies, clubId, articleNo, callback){
 
     req.on('error', function (e) {
         console.log('problem with request: ' + e.message);
+		callback(null, cookies, articleNo, 'ERROR');
     });
 
     req.end();

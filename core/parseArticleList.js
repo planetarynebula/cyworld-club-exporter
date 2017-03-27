@@ -4,7 +4,8 @@
 module.exports = function (cookies, articles, callback) {
     var cheerio = require('cheerio');
     var $ = cheerio.load(articles);
-    var itemList = $('table.board_type_tbl.board_member .col_title a');
+	var fs = require('fs');
+    var itemList = $('table.board_type_tbl.board_member .col_title a, table.board_type_tbl.board_admin .col_title a');
     var maxPage = 0;
 
     var maxPageCatch = /cpage=([0-9]+)/g.exec($('a.btn.last_page').attr('href'));
