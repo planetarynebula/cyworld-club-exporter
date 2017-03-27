@@ -64,7 +64,7 @@ async.waterfall([
                     },
                     function (cookies, result) {
                         fs.writeFile('result/gallery_list_' + pageNo + '.txt', JSON.stringify(result.articles));
-                        setTimeout(next, 2000);
+                        setTimeout(next, config.sleep);
                     }
                 ]);
             },

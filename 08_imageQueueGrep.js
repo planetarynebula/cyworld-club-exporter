@@ -7,6 +7,7 @@ var fs = require('fs');
 var Entities = require('html-entities').AllHtmlEntities;
 var entities = new Entities();
 var regex = /http\:\/\/[a-zA-Z0-9]+\.cyworld\.com\/[a-zA-Z0-9\.\?\=\%\/_\+]+/g;
+var regexAttach = /href="([^"]+)"/g;
 
 async.waterfall([
     // get list
@@ -44,10 +45,11 @@ async.waterfall([
                         var saveName = 'file_queue_' + filename;
 
                         if ('undefined' !== typeof json.files) {
-                            while (match = regex.exec(json.files)) {
+							var c = entities.decode(json.files);
+                            while (match = regexAttach.exec(c)) {
                                 queue.push({
                                     index: 'files',
-                                    original: match[0]
+                                    original: match[1]
                                 });
                             }
                         }

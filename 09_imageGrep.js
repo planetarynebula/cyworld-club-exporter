@@ -5,14 +5,17 @@ var async = require('async');
 var config = require('./core/config');
 var fs = require('fs');
 var http = require('http');
+var rehttp = require('follow-redirects').http;
 var crypto = require('crypto');
 var Stream = require('stream').Transform;
 var Entities = require('html-entities').AllHtmlEntities;
+var iconv = require('iconv-lite')
 var entities = new Entities();
 var regex = /(http\:\/\/[a-zA-Z0-9]+\.cyworld\.com\/[a-zA-Z0-9\.\?\=\%\/_\+]+)/g;
 var files = [];
 var statics = [];
-
+var regexpFilename = /filename=\"?(.*)\"?/i;
+var regexpIdMatch = /[-0-9]+/i
 async.waterfall([
     // get list
     function (callback) {
@@ -27,7 +30,7 @@ async.waterfall([
                 files.push(entry);
             }
         }
-
+		console.log(files.length);
         callback(null);
     },
 
@@ -68,8 +71,9 @@ async.waterfall([
                             function (entry, nextImage) {
                                 if (-1 === statics.indexOf(entry.original)) {
                                     statics.push(entry.original);
-                                    var newName = crypto.createHash('sha1').update(entry.original, 'utf8').digest('hex') + '.jpg';
+                                    var newName = crypto.createHash('sha1').update(entry.original, 'utf8').digest('hex');
                                     var address = /http\:\/\/([^\/]+)(\/.+)/g.exec(entry.original);
+									if(!address) address = ['', 'club.cyworld.com', entry.original];
                                     var options = {
                                         host: address[1],
                                         path: address[2],
@@ -84,19 +88,30 @@ async.waterfall([
                                             'Cookie': cookies
                                         }
                                     };
+									var rq = rehttp.request(options, function (res) {
+										newName = regexpIdMatch.exec(file)[0] + "_" + newName;
+										var fname = regexpFilename.exec( res.headers['content-disposition'] );
+										newName = newName + (fname ? iconv.decode(fname[1], 'EUC-KR').toString() : ".jpg");
+										if(!fname) {
+											console.log(res.headers['content-disposition']);
+										}
+										var imageStream = new Stream();
+										res.on('data', function (chunk) {
+											imageStream.push(chunk);
+										});
 
-                                    http.request(options, function (res) {
-                                        var imageStream = new Stream();
-                                        res.on('data', function (chunk) {
-                                            imageStream.push(chunk);
-                                        });
-
-                                        res.on('end', function () {
-                                            console.log('saved as - ' + newName);
-                                            fs.writeFileSync('./images/' + newName, imageStream.read());
-                                            nextImage();
-                                        });
-                                    }).end();
+										res.on('end', function () {
+											console.log('saved as - ' + newName);
+											fs.writeFileSync('./images/' + newName, imageStream.read());
+											nextImage();
+										});
+									});
+									rq.on('error', function(err) {
+										console.log(err);
+										console.log(address);
+										nextImage();
+									});
+									rq.end();
                                 } else {
                                     nextImage();
                                 }
@@ -128,7 +143,7 @@ async.waterfall([
 
                         setTimeout(function(){
                             next();
-                        }, 2000);
+                        }, config.sleep);
                     }
                 ]);
             }

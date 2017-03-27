@@ -19,13 +19,14 @@ async.waterfall([
         var queue = [];
         for (var i in list) {
             var entry = list[i];
-            if ('sketch_list_' === entry.substr(0, 12)) {
+            if ('gallery_list' === entry.substr(0, 12)) {
                 queue.push(entry);
             }
         }
 
         callback(null, queue);
     },
+
 
     function (queue, callback) {
         async.eachSeries(
@@ -48,6 +49,7 @@ async.waterfall([
             }
         );
     },
+
 
     // get auth
     function (callback) {
@@ -74,7 +76,7 @@ async.waterfall([
             articleId,
             function (articleNo, next) {
 				try {
-					if(!fs.accessSync('result/sketch_view_' + articleNo + '.txt')) {
+					if(!fs.accessSync('result/gallery_view_' + articleNo + '.txt')) {
 						console.log('skip article - ' + articleNo);
 						return next();
 					}
@@ -83,23 +85,23 @@ async.waterfall([
                 async.waterfall([
                     function (subroutine) {
                         console.log('download article - ' + articleNo);
-                        require('./core/sketchView')(cookies, config.clubId, articleNo, subroutine);
+                        require('./core/galleryView')(cookies, config.clubId, articleNo, subroutine);
                     },
 
                     function (cookies, articleNo, data, subroutine) {
                         console.log('parsing article - ' + articleNo);
-                        require('./core/parseSketchView')(cookies, articleNo, data, subroutine);
+                        require('./core/parseGalleryView')(cookies, articleNo, data, subroutine);
                     },
 
                     function (cookies, articleNo, contents) {
-                        fs.writeFile('result/sketch_view_' + articleNo + '.txt', JSON.stringify(contents));
+                        fs.writeFile('result/gallery_view_' + articleNo + '.txt', JSON.stringify(contents));
                         setTimeout(next, config.sleep);
                     }
                 ]);
             },
 
             function () {
-                console.log('sketches done');
+                console.log('galleries done');
             }
         );
     }

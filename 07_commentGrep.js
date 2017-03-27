@@ -50,9 +50,17 @@ async.waterfall([
         async.eachSeries(
             articleId,
             function (articleFile, next) {
+				try {
+					var articleCapture = /([a-z]+)_[a-z_]+([-0-9]+)\.txt/g.exec(articleFile);
+					if(!fs.accessSync('./result/comment_' + articleCapture[2] + '.txt')) {
+						console.log('skip article - ' + articleCapture[2]);
+						return next();
+					}
+				} catch(e) {
+				}
                 async.waterfall([
                     function (subroutine) {
-                        var articleCapture = /([a-z]+)_[a-z_]+([0-9]+)\.txt/g.exec(articleFile);
+                        var articleCapture = /([a-z]+)_[a-z_]+([-0-9]+)\.txt/g.exec(articleFile);
                         if (null !== articleCapture) {
                             subroutine(null, articleCapture[1], articleCapture[2]);
                         }
@@ -78,8 +86,9 @@ async.waterfall([
                     },
 
                     function (cookies, articleNo, contents) {
+						console.log('download article - ' + articleNo);
                         fs.writeFile("./result/comment_" + articleNo + '.txt', JSON.stringify(contents));
-                        setTimeout(next, 1000);
+                        setTimeout(next, config.sleep);
                     }
                 ]);
             },
