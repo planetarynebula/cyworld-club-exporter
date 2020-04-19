@@ -40,7 +40,14 @@ async.waterfall([
 
     function (cookies, result, callback) {
         console.log('get page count');
-        fs.writeFile('result/article_list_1.txt', JSON.stringify(result.articles));
+        fs.writeFile('result/article_list_1.txt', JSON.stringify(result.articles), function (err) {
+            if (err) {
+                console.log('error: cannot write article_list 1');
+                console.dir(err);
+                return;
+            }
+            console.log('success to write article_list 1')
+        });
 
         var queue = [];
         for (var i = 2; i <= result.maxPage; i++) {
@@ -63,7 +70,14 @@ async.waterfall([
                         require('./core/parseArticleList')(cookies, data, subroutine);
                     },
                     function (cookies, result) {
-                        fs.writeFile('result/article_list_' + pageNo + '.txt', JSON.stringify(result.articles));
+                        fs.writeFile('result/article_list_' + pageNo + '.txt', JSON.stringify(result.articles), function(err){
+                            if (err) {
+                                console.log('error: cannot write article_list ' + pageNo);
+                                console.dir(err);
+                                return;
+                            }
+                            console.log('success to write article_list ' + pageNo);
+                        });
                         setTimeout(next, config.sleep);
                     }
                 ]);

@@ -102,7 +102,14 @@ async.waterfall([
 
 										res.on('end', function () {
 											console.log('saved as - ' + newName);
-											fs.writeFileSync('./images/' + newName, imageStream.read());
+											fs.writeFileSync('./images/' + newName, imageStream.read(), function(err) {
+                                                if (err) {
+                                                    console.log('error: cannot write ' + newName);
+                                                    console.dir(err);
+                                                    return;
+                                                }
+                                                console.log('success to write ' + newName);
+                                            });
 											nextImage();
 										});
 									});
@@ -139,7 +146,14 @@ async.waterfall([
                             });
                         }
 
-                        fs.writeFile("./result/" + articleName, JSON.stringify(json));
+                        fs.writeFile("./result/" + articleName, JSON.stringify(json), function(err) {
+                            if (err) {
+                                console.log('error: cannot write ' + articleName);
+                                console.dir(err);
+                                return;
+                            }
+                            console.log('success to write article ' + articleName);
+                        });
 
                         setTimeout(function(){
                             next();

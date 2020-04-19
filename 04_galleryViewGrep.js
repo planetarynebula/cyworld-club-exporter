@@ -87,8 +87,15 @@ async.waterfall([
                     },
 
                     function (cookies, articleNo, contents) {
-                        fs.writeFile('result/gallery_view_' + articleNo + '.txt', JSON.stringify(contents));
-                        setTimeout(next, 1000);
+                        fs.writeFile('result/gallery_view_' + articleNo + '.txt', JSON.stringify(contents), function(err) {
+                            if (err) {
+                                console.log('error: cannot write gallery ' + articleNo);
+                                console.dir(err);
+                                return;
+                            }
+                            console.log('success to write article_list ' + articleNo);
+                        });
+                        setTimeout(next, config.sleep);
                     }
                 ]);
             },

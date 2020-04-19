@@ -87,7 +87,14 @@ async.waterfall([
 
                     function (cookies, articleNo, contents) {
 						console.log('download article - ' + articleNo);
-                        fs.writeFile("./result/comment_" + articleNo + '.txt', JSON.stringify(contents));
+                        fs.writeFile("./result/comment_" + articleNo + '.txt', JSON.stringify(contents), function(err) {
+                            if (err) {
+                                console.log('error: cannot write comment ' + articleNo);
+                                console.dir(err);
+                                return;
+                            }
+                            console.log('success to write comment ' + articleNo);
+                        });
                         setTimeout(next, config.sleep);
                     }
                 ]);

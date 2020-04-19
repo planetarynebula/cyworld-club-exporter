@@ -64,7 +64,14 @@ async.waterfall([
                         }
 
                         if (0 < queue.length) {
-                            fs.writeFile("./result/" + saveName, JSON.stringify(queue));
+                            fs.writeFile("./result/" + saveName, JSON.stringify(queue), function(err) {
+                                if (err) {
+                                    console.log('error: cannot write ' + saveName);
+                                    console.dir(err);
+                                    return;
+                                }
+                                console.log('success to write ' + saveName);
+                            });
                         }
 
                         next();
