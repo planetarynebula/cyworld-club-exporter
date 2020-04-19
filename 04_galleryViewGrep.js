@@ -75,13 +75,6 @@ async.waterfall([
         async.eachSeries(
             articleId,
             function (articleNo, next) {
-				try {
-					if(!fs.accessSync('result/gallery_view_' + articleNo + '.txt')) {
-						console.log('skip article - ' + articleNo);
-						return next();
-					}
-				} catch(e) {
-				}
                 async.waterfall([
                     function (subroutine) {
                         console.log('download article - ' + articleNo);
@@ -95,7 +88,7 @@ async.waterfall([
 
                     function (cookies, articleNo, contents) {
                         fs.writeFile('result/gallery_view_' + articleNo + '.txt', JSON.stringify(contents));
-                        setTimeout(next, config.sleep);
+                        setTimeout(next, 1000);
                     }
                 ]);
             },
