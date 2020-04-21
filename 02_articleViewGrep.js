@@ -94,11 +94,11 @@ async.waterfall([
                     function (cookies, articleNo, contents) {
                         fs.writeFile('result/article_view_' + articleNo + '.txt', JSON.stringify(contents), function(err) {
                             if (err) {
-                                console.log('error: cannot write article' + articleNo);
+                                console.log('error: cannot write article ' + articleNo);
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write article' + articleNo);
+                            console.log('success to write article ' + articleNo);
                         });
                         setTimeout(next, config.sleep);
                     }

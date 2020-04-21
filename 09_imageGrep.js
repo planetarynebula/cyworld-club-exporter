@@ -16,6 +16,11 @@ var files = [];
 var statics = [];
 var regexpFilename = /filename=\"?(.*)\"?/i;
 var regexpIdMatch = /[-0-9]+/i
+
+if (!fs.existsSync('./images')) {
+    fs.mkdirSync('./images');
+}
+
 async.waterfall([
     // get list
     function (callback) {

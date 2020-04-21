@@ -6,6 +6,10 @@ var cheerio = require('cheerio');
 var config = require('./core/config');
 var fs = require('fs');
 
+if (!fs.existsSync('./result')) {
+    fs.mkdirSync('./result');
+}
+
 var articles = [];
 
 async.waterfall([
