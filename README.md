@@ -21,6 +21,7 @@ MIT 라이센서를 따릅니다.
  - iconv-lite
  - cheerio
  - html-entities
+ - follow-redirects
  
 ## 설정은
  - core/config.js 에서 아래의 항목을 수정하여 주세요!!
