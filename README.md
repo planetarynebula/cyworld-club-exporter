@@ -11,17 +11,17 @@ MIT 라이센서를 따릅니다.
 ## 필요한것은?
 - node.js
 - npm modules
- - http
- - https
- - querystring
- - async
- - crypto
- - stream
- - fs
- - iconv-lite
- - cheerio
- - html-entities
- - follow-redirects
+  - http
+  - https
+  - querystring
+  - async
+  - crypto
+  - stream
+  - fs
+  - iconv-lite
+  - cheerio
+  - html-entities
+  - follow-redirects
  
 - python3
   - bs4
