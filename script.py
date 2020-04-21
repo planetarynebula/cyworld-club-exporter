@@ -2,6 +2,11 @@ import os, json, re, datetime
 from bs4 import BeautifulSoup
 from shutil import copyfile
 
+article_list = os.listdir('./result')
+gallery_list = os.listdir('./result')
+comment_list = os.listdir('./result')
+file_list = os.listdir('./images')
+
 def get_valid_folder_name(name):
     return name.replace('/','.').replace('?', '.').replace('<','[').replace('>',']').replace('"',"'").replace(':','-').replace('*',' ').replace('|',' ').strip()
 
@@ -70,12 +75,6 @@ def function(filename, topic):
                             for data in valid_comments:
                                 fw.write(data['username'] + ' (' + data['registerAt'] + ')\n')
                                 fw.write(data['contents'] + '\n\n')
-
-
-article_list = os.listdir('./result')
-gallery_list = os.listdir('./result')
-comment_list = os.listdir('./result')
-file_list = os.listdir('./images')
 
 articles = [article for article in article_list if article.startswith("article_list_")]
 for article in articles[:]:
