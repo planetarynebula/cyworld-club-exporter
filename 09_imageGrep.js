@@ -157,7 +157,7 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write article ' + articleName);
+                            console.log('success to write ' + articleName);
                         });
 
                         setTimeout(function(){
