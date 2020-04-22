@@ -93,7 +93,7 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write article_list ' + articleNo);
+                            console.log('success to write gallery ' + articleNo);
                         });
                         setTimeout(next, config.sleep);
                     }
