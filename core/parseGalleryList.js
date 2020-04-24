@@ -10,6 +10,8 @@ module.exports = function (cookies, articles, callback) {
     var maxPageCatch = /cpage=([0-9]+)/g.exec($('a.btn.last_page').attr('href'));
     if (null !== maxPageCatch) {
         maxPage = parseInt(maxPageCatch[1]);
+    } else {
+        maxPage = $('.wrap_paging').children('a').length + 1;
     }
 
     var result = {

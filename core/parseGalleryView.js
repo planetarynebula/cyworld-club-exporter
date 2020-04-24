@@ -11,6 +11,6 @@ module.exports = function (cookies, articleNo, articles, callback) {
         subject: $('.wrapTitle h4').text().trim(),
         registerAt: $('.box_posting_info em.dateinfo').text().trim(),
         username: $('.box_posting_info a.nameui').text().trim(),
-        contents: $('.box_article_content').html().trim()
+        contents: ($('.box_article_content').html() != null ? $('.box_article_content').html() : " ").trim()
     });
 };
