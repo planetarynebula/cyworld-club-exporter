@@ -5,6 +5,7 @@ var async = require('async');
 var fs = require('fs');
 var cheerio = require('cheerio');
 var config = require('./core/config');
+var ProgressBar = require('progress');
 
 var articleId = [];
 
@@ -72,17 +73,31 @@ async.waterfall([
     },
 
     function (cookies) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: articleId.length
+        });
         async.eachSeries(
             articleId,
             function (articleNo, next) {
+                try {
+					if(!fs.accessSync('./result/gallery_view_' + articleNo + '.txt')) {
+                        // console.log('skip gallery - ' + articleNo);
+                        bar.tick();
+						return next();
+					}
+				} catch(e) {
+				}
                 async.waterfall([
                     function (subroutine) {
-                        console.log('download article - ' + articleNo);
+                        // console.log('download gallery - ' + articleNo);
                         require('./core/galleryView')(cookies, config.clubId, articleNo, subroutine);
                     },
 
                     function (cookies, articleNo, data, subroutine) {
-                        console.log('parsing article - ' + articleNo);
+                        // console.log('parsing gallery - ' + articleNo);
                         require('./core/parseGalleryView')(cookies, articleNo, data, subroutine);
                     },
 
@@ -93,9 +108,10 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write gallery ' + articleNo);
+                            // console.log('success to write gallery ' + articleNo);
                         });
                         setTimeout(next, config.sleep);
+                        bar.tick();
                     }
                 ]);
             },

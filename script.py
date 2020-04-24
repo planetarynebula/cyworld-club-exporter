@@ -57,29 +57,63 @@ def function(filename, topic):
                                 break
                     f.write(str(soup))
                 
-                with open('./result/'+comment, "r") as fr:
-                    line = fr.readline()
-                    data_list = json.loads(line)
-                    valid_comments = []
-                    if data_list:
-                        for data in data_list:
-                            is_ok = True
-                            for i in valid_comments:
-                                if i == data:
-                                    is_ok = False
-                                    break
-                            if is_ok:
-                                valid_comments.append(data)
+                try:
+                    with open('./result/'+comment, "r") as fr:
+                        line = fr.readline()
+                        data_list = json.loads(line)
+                        valid_comments = []
+                        if data_list:
+                            for data in data_list:
+                                is_ok = True
+                                for i in valid_comments:
+                                    if i == data:
+                                        is_ok = False
+                                        break
+                                if is_ok:
+                                    valid_comments.append(data)
 
-                        with open (os.path.join(file_path, "comment.txt"), "w") as fw:
-                            for data in valid_comments:
-                                fw.write(data['username'] + ' (' + data['registerAt'] + ')\n')
-                                fw.write(data['contents'] + '\n\n')
+                            with open (os.path.join(file_path, "comment.txt"), "w") as fw:
+                                for data in valid_comments:
+                                    fw.write(data['username'] + ' (' + data['registerAt'] + ')\n')
+                                    fw.write(data['contents'] + '\n\n')
+                except:
+                    pass
+
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
 
 articles = [article for article in article_list if article.startswith("article_list_")]
+print('start article...')
+tot = len(articles)
+cnt = 0
 for article in articles[:]:
     function(article, 'article')
+    cnt += 1
+    printProgressBar(cnt, tot)
 
 galleries = [gallery for gallery in gallery_list if gallery.startswith("gallery_list_")]
+print('start gallery...')
+tot = len(galleries)
+cnt = 0
 for gallery in galleries[:]:
     function(gallery, 'gallery')
+    cnt += 1
+    printProgressBar(cnt, tot)

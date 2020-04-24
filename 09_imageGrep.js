@@ -16,6 +16,7 @@ var files = [];
 var statics = [];
 var regexpFilename = /filename=\"?(.*)\"?/i;
 var regexpIdMatch = /[-0-9]+/i
+var ProgressBar = require('progress');
 
 if (!fs.existsSync('./images')) {
     fs.mkdirSync('./images');
@@ -61,16 +62,22 @@ async.waterfall([
 
     // get files
     function (cookies) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: files.length
+        });
         async.eachSeries(
             files,
             function (file, next) {
                 async.waterfall([
                     function (subroutine) {
-                        console.log('read file - ' + file);
+                        // console.log('read file - ' + file);
                         fs.readFile('./result/' + file, 'utf8', subroutine);
                     },
                     function (data, subroutine) {
-                        console.log('save image - ' + file);
+                        // console.log('save image - ' + file);
                         async.eachSeries(
                             JSON.parse(data),
                             function (entry, nextImage) {
@@ -106,14 +113,14 @@ async.waterfall([
 										});
 
 										res.on('end', function () {
-											console.log('saved as - ' + newName);
+											// console.log('saved as - ' + newName);
 											fs.writeFileSync('./images/' + newName, imageStream.read(), function(err) {
                                                 if (err) {
                                                     console.log('error: cannot write ' + newName);
                                                     console.dir(err);
                                                     return;
                                                 }
-                                                console.log('success to write ' + newName);
+                                                // console.log('success to write ' + newName);
                                             });
 											nextImage();
 										});
@@ -134,12 +141,12 @@ async.waterfall([
                     },
                     function (subroutine) {
                         var articleName = file.replace('file_queue_', '');
-                        console.log('read original article - ' + articleName);
+                        // console.log('read original article - ' + articleName);
                         fs.readFile('./result/' + articleName, 'utf8', subroutine);
                     },
                     function (data) {
                         var articleName = file.replace('file_queue_', '');
-                        console.log('save original article - ' + articleName);
+                        // console.log('save original article - ' + articleName);
                         var json = JSON.parse(data);
                         json.contents = entities.decode(json.contents);
                         json.contents = json.contents.replace(regex, function(match){
@@ -157,8 +164,10 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write ' + articleName);
+                            // console.log('success to write ' + articleName);
                         });
+
+                        bar.tick();
 
                         setTimeout(function(){
                             next();

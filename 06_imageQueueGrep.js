@@ -8,6 +8,7 @@ var Entities = require('html-entities').AllHtmlEntities;
 var entities = new Entities();
 var regex = /http\:\/\/[a-zA-Z0-9]+\.cyworld\.com\/[a-zA-Z0-9\.\?\=\%\/_\+]+/g;
 var regexAttach = /href="([^"]+)"/g;
+var ProgressBar = require('progress');
 
 async.waterfall([
     // get list
@@ -29,6 +30,12 @@ async.waterfall([
     },
 
     function (queue) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: queue.length
+        });
         async.eachSeries(
             queue,
             function (filename, next) {
@@ -70,10 +77,11 @@ async.waterfall([
                                     console.dir(err);
                                     return;
                                 }
-                                console.log('success to write ' + saveName);
+                                // console.log('success to write ' + saveName);
                             });
                         }
-
+                        bar.tick();
+                        
                         next();
                     }
                 ]);

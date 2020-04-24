@@ -5,6 +5,7 @@ var async = require('async');
 var cheerio = require('cheerio');
 var config = require('./core/config');
 var fs = require('fs');
+var ProgressBar = require('progress');
 
 var articles = [];
 
@@ -58,6 +59,12 @@ async.waterfall([
     },
 
     function (cookies, queue) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: queue.length
+        });
         async.eachSeries(
             queue,
             function (pageNo, next) {
@@ -66,7 +73,7 @@ async.waterfall([
                         require('./core/galleryList')(cookies, config.clubId, pageNo, subroutine);
                     },
                     function (cookies, data, subroutine) {
-                        console.log('parsing page - ' + pageNo);
+                        // console.log('parsing page - ' + pageNo);
                         require('./core/parseGalleryList')(cookies, data, subroutine);
                     },
                     function (cookies, result) {
@@ -76,9 +83,10 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write gallery_list ' + pageNo);
+                            // console.log('success to write gallery_list ' + pageNo);
                         });
                         setTimeout(next, config.sleep);
+                        bar.tick();
                     }
                 ]);
             },

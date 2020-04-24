@@ -5,6 +5,7 @@ var async = require('async');
 var fs = require('fs');
 var cheerio = require('cheerio');
 var config = require('./core/config');
+var ProgressBar = require('progress');
 
 var articleId = [];
 
@@ -47,13 +48,20 @@ async.waterfall([
     },
 
     function (cookies) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: articleId.length 
+        });
         async.eachSeries(
             articleId,
             function (articleFile, next) {
 				try {
 					var articleCapture = /([a-z]+)_[a-z_]+([-0-9]+)\.txt/g.exec(articleFile);
 					if(!fs.accessSync('./result/comment_' + articleCapture[2] + '.txt')) {
-						console.log('skip article - ' + articleCapture[2]);
+                        // console.log('skip article - ' + articleCapture[2]);
+                        bar.tick();
 						return next();
 					}
 				} catch(e) {
@@ -81,21 +89,27 @@ async.waterfall([
                     },
 
                     function (cookies, articleNo, data, subroutine) {
-                        console.log('parsing article - ' + articleNo);
+                        // console.log('parsing article - ' + articleNo);
                         require('./core/parseComment')(cookies, articleNo, data, subroutine);
                     },
 
                     function (cookies, articleNo, contents) {
-						console.log('download article - ' + articleNo);
-                        fs.writeFile("./result/comment_" + articleNo + '.txt', JSON.stringify(contents), function(err) {
-                            if (err) {
-                                console.log('error: cannot write comment ' + articleNo);
-                                console.dir(err);
-                                return;
-                            }
-                            console.log('success to write comment ' + articleNo);
-                        });
-                        setTimeout(next, config.sleep);
+                        // console.log('download article - ' + articleNo);
+                        var text = JSON.stringify(contents);
+                        if ("[]" !== text) {
+                            fs.writeFile("./result/comment_" + articleNo + '.txt', text, function(err) {
+                                if (err) {
+                                    console.log('error: cannot write comment ' + articleNo);
+                                    console.dir(err);
+                                    return;
+                                }
+                                // console.log('success to write comment ' + articleNo);
+                            }); 
+                            setTimeout(next, config.sleep);
+                        } else {
+                            setTimeout(next, 10);
+                        }
+                        bar.tick();
                     }
                 ]);
             },

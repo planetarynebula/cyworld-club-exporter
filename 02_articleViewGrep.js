@@ -6,6 +6,7 @@ var cheerio = require('cheerio');
 var fs = require('fs');
 var config = require('./core/config');
 var articleId = [];
+var ProgressBar = require('progress');
 
 async.waterfall([
     // get list
@@ -70,24 +71,31 @@ async.waterfall([
     },
 
     function (cookies) {
+        var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: articleId.length
+        });
         async.eachSeries(
             articleId,
             function (articleNo, next) {
 				try {
 					if(!fs.accessSync('result/article_view_' + articleNo + '.txt')) {
-						console.log('skip article - ' + articleNo);
+                        // console.log('skip article - ' + articleNo);
+                        bar.tick();
 						return next();
 					}
 				} catch(e) {
 				}
                 async.waterfall([
                     function (subroutine) {
-                        console.log('download article - ' + articleNo);
+                        // console.log('download article - ' + articleNo);
                         require('./core/articleView')(cookies, config.clubId, articleNo, subroutine);
                     },
 
                     function (cookies, articleNo, data, subroutine) {
-                        console.log('parsing article - ' + articleNo);
+                        // console.log('parsing article - ' + articleNo);
                         require('./core/parseArticleView')(cookies, articleNo, data, subroutine);
                     },
 
@@ -98,9 +106,10 @@ async.waterfall([
                                 console.dir(err);
                                 return;
                             }
-                            console.log('success to write article ' + articleNo);
+                            // console.log('success to write article ' + articleNo);
                         });
                         setTimeout(next, config.sleep);
+                        bar.tick();
                     }
                 ]);
             },

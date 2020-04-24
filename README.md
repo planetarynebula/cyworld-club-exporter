@@ -27,6 +27,7 @@ MIT 라이센서를 따릅니다.
   - cheerio
   - html-entities
   - follow-redirects
+  - progress
  
 - python3
   - bs4
