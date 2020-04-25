@@ -91,7 +91,7 @@ async.waterfall([
                 ]);
             },
             function () {
-                console.log('galleries done');
+                bar.interrupt('galleries done');
             }
         );
     }

@@ -87,7 +87,7 @@ async.waterfall([
                 ]);
             },
             function () {
-                console.log('attach file queue save done');
+                bar.interrupt('attach file queue save done');
             }
         );
     }

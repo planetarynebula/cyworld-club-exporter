@@ -95,7 +95,7 @@ async.waterfall([
                 ]);
             },
             function () {
-                console.log('articles done');
+                bar.interrupt('articles done');
             }
         );
     }

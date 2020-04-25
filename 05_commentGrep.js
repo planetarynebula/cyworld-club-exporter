@@ -115,7 +115,7 @@ async.waterfall([
             },
 
             function () {
-                console.log('comments done');
+                bar.interrupt('comments done');
             }
         );
     }
