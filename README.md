@@ -47,9 +47,9 @@ node 01_articleListGrep.js // 전체 글보기 리스트 파일로 저장
 node 02_articleViewGrep.js // 전체 글보기 게시물 파일로 저장
 node 03_galleryListGrep.js // 전체 사진보기 리스트 파일로 저장
 node 04_galleryViewGrep.js // 전체 사진보기 게시물 파일로 저장
-node 07_commentGrep.js // 모든 게시물 댓글 파일로 저장
-node 08_imageQueueGrep.js // 게시물내 첨부 이미지 저장 준비
-node 09_imageGrep.js // 첨부 이미지 다운로드
+node 05_commentGrep.js // 모든 게시물 댓글 파일로 저장
+node 06_imageQueueGrep.js // 게시물내 첨부 이미지 저장 준비
+node 07_imageGrep.js // 첨부 이미지 다운로드
 ```
 result 폴더에 게시글 정보가 json 형식으로 저장되고, images 폴더에 사진과 첨부 파일이 저장됨.
 
