@@ -74,7 +74,7 @@ async.waterfall([
         var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
             complete: '=',
             incomplete: ' ',
-            width: 20,
+            width: 50,
             total: articleId.length
         });
         async.eachSeries(
@@ -82,7 +82,7 @@ async.waterfall([
             function (articleNo, next) {
 				try {
 					if(!fs.accessSync('result/article_view_' + articleNo + '.txt')) {
-                        // console.log('skip article - ' + articleNo);
+                        bar.interrupt('skip article - ' + articleNo);
                         bar.tick();
 						return next();
 					}
@@ -90,23 +90,23 @@ async.waterfall([
 				}
                 async.waterfall([
                     function (subroutine) {
-                        // console.log('download article - ' + articleNo);
+                        bar.interrupt('download article - ' + articleNo);
                         require('./core/articleView')(cookies, config.clubId, articleNo, subroutine);
                     },
 
                     function (cookies, articleNo, data, subroutine) {
-                        // console.log('parsing article - ' + articleNo);
+                        bar.interrupt('parsing article - ' + articleNo);
                         require('./core/parseArticleView')(cookies, articleNo, data, subroutine);
                     },
 
                     function (cookies, articleNo, contents) {
                         fs.writeFile('result/article_view_' + articleNo + '.txt', JSON.stringify(contents), function(err) {
                             if (err) {
-                                console.log('error: cannot write article ' + articleNo);
+                                bar.interrupt('error: cannot write article ' + articleNo);
                                 console.dir(err);
                                 return;
                             }
-                            // console.log('success to write article ' + articleNo);
+                            bar.interrupt('success to write article ' + articleNo);
                         });
                         setTimeout(next, config.sleep);
                         bar.tick();

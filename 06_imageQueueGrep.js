@@ -33,7 +33,7 @@ async.waterfall([
         var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
             complete: '=',
             incomplete: ' ',
-            width: 20,
+            width: 50,
             total: queue.length
         });
         async.eachSeries(
@@ -73,11 +73,11 @@ async.waterfall([
                         if (0 < queue.length) {
                             fs.writeFile("./result/" + saveName, JSON.stringify(queue), function(err) {
                                 if (err) {
-                                    console.log('error: cannot write ' + saveName);
+                                    bar.interrupt('error: cannot write ' + saveName);
                                     console.dir(err);
                                     return;
                                 }
-                                // console.log('success to write ' + saveName);
+                                bar.interrupt('success to write ' + saveName);
                             });
                         }
                         bar.tick();

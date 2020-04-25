@@ -65,7 +65,7 @@ async.waterfall([
         var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
             complete: '=',
             incomplete: ' ',
-            width: 20,
+            width: 50,
             total: files.length
         });
         async.eachSeries(
@@ -73,11 +73,11 @@ async.waterfall([
             function (file, next) {
                 async.waterfall([
                     function (subroutine) {
-                        // console.log('read file - ' + file);
+                        bar.interrupt('read file - ' + file);
                         fs.readFile('./result/' + file, 'utf8', subroutine);
                     },
                     function (data, subroutine) {
-                        // console.log('save image - ' + file);
+                        bar.interrupt('save image - ' + file);
                         async.eachSeries(
                             JSON.parse(data),
                             function (entry, nextImage) {
@@ -105,7 +105,7 @@ async.waterfall([
 										var fname = regexpFilename.exec( res.headers['content-disposition'] );
 										newName = newName + (fname ? iconv.decode(fname[1], 'EUC-KR').toString() : ".jpg");
 										if(!fname) {
-											console.log(res.headers['content-disposition']);
+											bar.interrupt('articleNo = ' + file.articleNo + ' ' + res.headers['content-disposition']);
 										}
 										var imageStream = new Stream();
 										res.on('data', function (chunk) {
@@ -113,21 +113,21 @@ async.waterfall([
 										});
 
 										res.on('end', function () {
-											// console.log('saved as - ' + newName);
+											bar.interrupt('saved as - ' + newName);
 											fs.writeFileSync('./images/' + newName, imageStream.read(), function(err) {
                                                 if (err) {
-                                                    console.log('error: cannot write ' + newName);
+                                                    bar.interrupt('\nerror: cannot write ' + newName);
                                                     console.dir(err);
                                                     return;
                                                 }
-                                                // console.log('success to write ' + newName);
+                                                bar.interrupt('success to write ' + newName);
                                             });
 											nextImage();
 										});
 									});
 									rq.on('error', function(err) {
-										console.log(err);
-										console.log(address);
+                                        bar.interrupt('articleNo: ' + file.articleNo + ' ' + err);
+										bar.interrupt(address);
 										nextImage();
 									});
 									rq.end();
@@ -141,12 +141,12 @@ async.waterfall([
                     },
                     function (subroutine) {
                         var articleName = file.replace('file_queue_', '');
-                        // console.log('read original article - ' + articleName);
+                        bar.interrupt('read original article - ' + articleName);
                         fs.readFile('./result/' + articleName, 'utf8', subroutine);
                     },
                     function (data) {
                         var articleName = file.replace('file_queue_', '');
-                        // console.log('save original article - ' + articleName);
+                        bar.interrupt('save original article - ' + articleName);
                         var json = JSON.parse(data);
                         json.contents = entities.decode(json.contents);
                         json.contents = json.contents.replace(regex, function(match){
@@ -160,11 +160,11 @@ async.waterfall([
 
                         fs.writeFile("./result/" + articleName, JSON.stringify(json), function(err) {
                             if (err) {
-                                console.log('error: cannot write ' + articleName);
+                                bar.interrupt('error: cannot write ' + articleName);
                                 console.dir(err);
                                 return;
                             }
-                            // console.log('success to write ' + articleName);
+                            bar.interrupt('success to write ' + articleName);
                         });
 
                         bar.tick();

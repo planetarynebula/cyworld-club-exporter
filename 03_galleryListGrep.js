@@ -62,7 +62,7 @@ async.waterfall([
         var bar = new ProgressBar(' downloading [:bar] :rate/bps :percent :etas', { 
             complete: '=',
             incomplete: ' ',
-            width: 20,
+            width: 50,
             total: queue.length
         });
         async.eachSeries(
@@ -73,17 +73,17 @@ async.waterfall([
                         require('./core/galleryList')(cookies, config.clubId, pageNo, subroutine);
                     },
                     function (cookies, data, subroutine) {
-                        // console.log('parsing page - ' + pageNo);
+                        bar.interrupt('parsing page - ' + pageNo);
                         require('./core/parseGalleryList')(cookies, data, subroutine);
                     },
                     function (cookies, result) {
                         fs.writeFile('result/gallery_list_' + pageNo + '.txt', JSON.stringify(result.articles), function(err) {
                             if (err) {
-                                console.log('error: cannot write gallery_list ' + pageNo);
+                                bar.interrupt('error: cannot write gallery_list ' + pageNo);
                                 console.dir(err);
                                 return;
                             }
-                            // console.log('success to write gallery_list ' + pageNo);
+                            bar.interrupt('success to write gallery_list ' + pageNo);
                         });
                         setTimeout(next, config.sleep);
                         bar.tick();
